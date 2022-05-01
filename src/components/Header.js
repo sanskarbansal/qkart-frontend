@@ -17,6 +17,7 @@ const Header = ({ children, hasHiddenAuthButtons }) => {
       <Box className="header-title">
         <img src="logo_light.svg" alt="QKart-icon"></img>
       </Box>
+      {children}
       {hasHiddenAuthButtons ? (
         <Button
           className="explore-button"
