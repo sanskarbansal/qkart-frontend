@@ -56,7 +56,11 @@ const Login = () => {
         enqueueSnackbar("Logged in successfully", {
           variant: "success",
         });
-        persistLogin(response.data?.token, response.data?.username, response.data?.balance); 
+        persistLogin(
+          response.data?.token,
+          response.data?.username,
+          response.data?.balance
+        );
         push("/");
       }
     } catch (error) {
@@ -124,9 +128,9 @@ const Login = () => {
    * -    `balance` field in localStorage can be used to store the balance amount in the user's wallet
    */
   const persistLogin = (token, username, balance) => {
-    localStorage.setItem("token", token); 
-    localStorage.setItem("username", username); 
-    localStorage.setItem("balance", balance); 
+    localStorage.setItem("token", token);
+    localStorage.setItem("username", username);
+    localStorage.setItem("balance", balance);
   };
 
   return (
