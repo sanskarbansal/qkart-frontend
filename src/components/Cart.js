@@ -4,7 +4,7 @@ import {
   ShoppingCart,
   ShoppingCartOutlined,
 } from "@mui/icons-material";
-import { Button, IconButton, Stack } from "@mui/material";
+import { Button, IconButton, Stack, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
@@ -76,6 +76,22 @@ export const getTotalCartValue = (items = []) => {
   return items.reduce((prev, curr) => prev + curr?.qty * curr?.cost, 0);
 };
 
+// TODO: CRIO_TASK_MODULE_CHECKOUT - Implement function to return total cart quantity
+/**
+ * Return the sum of quantities of all products added to the cart
+ *
+ * @param { Array.<CartItem> } items
+ *    Array of objects with complete data on products in cart
+ *
+ * @returns { Number }
+ *    Total quantity of products added to the cart
+ *
+ */
+export const getTotalItems = (items = []) => {
+  return items.reduce((prevSum, currItem) => prevSum + currItem?.qty, 0);
+};
+
+// TODO: CRIO_TASK_MODULE_CHECKOUT - Add static quantity view for Checkout page cart
 /**
  * Component to display the current quantity for a product and + and - buttons to update product quantity on cart
  *
@@ -88,20 +104,27 @@ export const getTotalCartValue = (items = []) => {
  * @param {Function} handleDelete
  *    Handler function which reduces the quantity of a product in cart by 1
  *
+ * @param {Boolean} isReadOnly
+ *    If product quantity on cart is to be displayed as read only without the + - options to change quantity
  *
  */
-const ItemQuantity = ({ value, handleAdd, handleDelete }) => {
+const ItemQuantity = ({ value, handleAdd, handleDelete, isReadOnly }) => {
   return (
     <Stack direction="row" alignItems="center">
-      <IconButton size="small" color="primary" onClick={handleDelete}>
-        <RemoveOutlined />
-      </IconButton>
+      {!isReadOnly && (
+        <IconButton size="small" color="primary" onClick={handleDelete}>
+          <RemoveOutlined />
+        </IconButton>
+      )}
+      {isReadOnly && <Typography>Qty</Typography>}
       <Box padding="0.5rem" data-testid="item-qty">
         {value}
       </Box>
-      <IconButton size="small" color="primary" onClick={handleAdd}>
-        <AddOutlined />
-      </IconButton>
+      {!isReadOnly && (
+        <IconButton size="small" color="primary" onClick={handleAdd}>
+          <AddOutlined />
+        </IconButton>
+      )}
     </Stack>
   );
 };
@@ -118,9 +141,11 @@ const ItemQuantity = ({ value, handleAdd, handleDelete }) => {
  * @param {Function} handleDelete
  *    Current quantity of product in cart
  *
+ * @param {Boolean} isReadOnly
+ *    If product quantity on cart is to be displayed as read only without the + - options to change quantity
  *
  */
-const Cart = ({ products, items = [], handleQuantity }) => {
+const Cart = ({ products, items = [], handleQuantity, isReadOnly }) => {
   const { push } = useHistory();
   if (!items.length) {
     return (
@@ -136,7 +161,6 @@ const Cart = ({ products, items = [], handleQuantity }) => {
   return (
     <>
       <Box className="cart">
-        {/* TODO: CRIO_TASK_MODULE_CART - Display view for each cart item with non-zero quantity */}
         <Box
           padding="1rem"
           display="flex"
@@ -160,8 +184,8 @@ const Cart = ({ products, items = [], handleQuantity }) => {
         {items.map((item) => (
           <Box
             key={item?.productId}
-            display="flex"
             alignItems="flex-start"
+            display="flex"
             padding="1rem"
           >
             <Box className="image-container">
@@ -186,6 +210,7 @@ const Cart = ({ products, items = [], handleQuantity }) => {
                 alignItems="center"
               >
                 <ItemQuantity
+                  isReadOnly={isReadOnly}
                   value={item?.qty}
                   handleAdd={() => {
                     handleQuantity(item?.productId, item?.qty + 1);
@@ -202,17 +227,19 @@ const Cart = ({ products, items = [], handleQuantity }) => {
           </Box>
         ))}
 
-        <Box display="flex" justifyContent="flex-end" className="cart-footer">
-          <Button
-            color="primary"
-            variant="contained"
-            startIcon={<ShoppingCart />}
-            className="checkout-btn"
-            onClick={() => push("/checkout")}
-          >
-            Checkout
-          </Button>
-        </Box>
+        {!isReadOnly && (
+          <Box display="flex" justifyContent="flex-end" className="cart-footer">
+            <Button
+              color="primary"
+              variant="contained"
+              startIcon={<ShoppingCart />}
+              className="checkout-btn"
+              onClick={() => push("/checkout")}
+            >
+              Checkout
+            </Button>
+          </Box>
+        )}
       </Box>
     </>
   );
